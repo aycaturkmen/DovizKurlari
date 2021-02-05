@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+
 
 namespace DovizApi.Controllers
 {
@@ -15,6 +17,7 @@ namespace DovizApi.Controllers
 
         XElement xelement = XElement.Load("https://www.tcmb.gov.tr/kurlar/today.xml"); //xelement tcmb'den çekilen tüm kur bilgilerini tutar
 
+
         [HttpGet]
         public string Get()
         {
@@ -24,7 +27,6 @@ namespace DovizApi.Controllers
             xmlDoc.LoadXml(xmlTcmbData);
             string jsonTcmbData = JsonConvert.SerializeXmlNode(xmlDoc);
             return jsonTcmbData;
-
         }
 
         [HttpGet("{secilenDoviz}")]
@@ -41,7 +43,11 @@ namespace DovizApi.Controllers
                     secilenDovizCinsi = dovizCinsi.ToString();
                 }              
             }
-            return secilenDovizCinsi.ToString();
+            XmlDocument xmlDoviz = new XmlDocument();
+            string xmlDovizData = secilenDovizCinsi.ToString();
+            xmlDoviz.LoadXml(xmlDovizData);
+            string jsonDovizData = JsonConvert.SerializeXmlNode(xmlDoviz);
+            return jsonDovizData;
         }
 
         [HttpGet("{altLimit},{ustLimit}")]
@@ -66,7 +72,13 @@ namespace DovizApi.Controllers
                     secilenAraliktakiler = secilenAraliktakiler + dovizCinsi.ToString();
                 }      
             }
-            return secilenAraliktakiler.ToString();
+
+            string secilenDovizler = "<xml>" + secilenAraliktakiler + "</xml>";
+            XmlDocument xmlForex = new XmlDocument();
+            string xmlForexData = secilenDovizler.ToString();
+            xmlForex.LoadXml(xmlForexData);
+            string jsonForexData = JsonConvert.SerializeXmlNode(xmlForex);
+            return jsonForexData;
 
         }
     }
